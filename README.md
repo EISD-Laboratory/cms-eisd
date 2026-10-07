@@ -36,8 +36,8 @@ The public website is a read-only consumer of published content — it has no wr
 
 Currently past planning and into **V1 implementation**. V1 scope covers Authentication, Dashboard, Event Management, Medium Article Management, and Achievement Management. Achievements are specified in [`openspec/specs/achievements/`](./openspec/specs/achievements/) with database schema plus seeds and a mock-mode frontend; the backend API is still pending. See:
 
-- [`PLAN_V1.md`](./PLAN_V1.md) — the detailed V1 product requirements and information architecture.
-- [`ROADMAP.md`](./ROADMAP.md) — the rough plan from V1 through V4.
+- [`PLAN_V1.md`](./docs/PLAN_V1.md) — the detailed V1 product requirements and information architecture.
+- [`ROADMAP.md`](./docs/ROADMAP.md) — the rough plan from V1 through V4.
 
 ## Design Philosophy
 

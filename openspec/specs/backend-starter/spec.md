@@ -57,7 +57,7 @@ The starter SHALL provide PostgreSQL via the kept `docker-compose.yml`, so a lea
 
 ### Requirement: Rebuild contract is documented in CHALLENGE.md
 
-The starter SHALL include a `CHALLENGE.md` at the repo root that states the API surface to rebuild (content endpoints, auth mount point, role rules for reads vs. writes, publish/unpublish transitions, image-handling expectations, and the computed event-status rule) and points at `PLAN_V1.md` plus `openspec/specs/` as the source of truth, so learners never have to guess the target.
+The starter SHALL include a `CHALLENGE.md` at `docs/CHALLENGE.md` that states the API surface to rebuild (content endpoints, auth mount point, role rules for reads vs. writes, publish/unpublish transitions, image-handling expectations, and the computed event-status rule) and points at `docs/PLAN_V1.md` plus `openspec/specs/` as the source of truth, so learners never have to guess the target.
 
 #### Scenario: Contract covers every frontend integration
 
@@ -80,9 +80,9 @@ The starter SHALL keep the removed backend recoverable by the owner via a git ta
 
 ### Requirement: Existing product specs are untouched
 
-The reset SHALL NOT modify any existing product specification under `openspec/specs/` nor `PLAN_V1.md`, so the requirements learners build toward are byte-identical to the ones the reference backend satisfied.
+The reset SHALL NOT modify any existing product specification under `openspec/specs/` nor `docs/PLAN_V1.md`, so the requirements learners build toward are byte-identical to the ones the reference backend satisfied.
 
 #### Scenario: Specs show no diff
 
-- **WHEN** the owner diffs the reset revision against its parent for `openspec/specs/` and `PLAN_V1.md`
+- **WHEN** the owner diffs the reset revision against its parent for `openspec/specs/` and `docs/PLAN_V1.md`
 - **THEN** there are zero changes

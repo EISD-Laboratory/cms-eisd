@@ -1,23 +1,30 @@
 # Tasks
 
-## 1. Frontend auth removal
+## 1. Mock session store
 
-- [ ] 1.1 Delete `src/lib/auth-client.ts`, `src/context/AuthContext.tsx`, `src/context/auth-state.ts`, `src/context/useAuth.ts`, `src/types/auth.ts`, `src/lib/roles.ts`, `src/pages/Login.tsx` and verify none of those paths exist
-- [ ] 1.2 Unwrap `ProtectedRoute` (pass-through render) and remove `AuthProvider` wrapper plus `/login` route from `src/App.tsx`, and verify `tsc -b` passes with no auth imports
-- [ ] 1.3 Remove all `useAuth`/`signOut` usages and role-conditional UI in `Dashboard`, `Events`, `EventForm`, `Articles`, `ArticleForm`, `Achievements`, `AchievementForm` (all actions always visible), and verify `tsc -b` passes
-- [ ] 1.4 Remove `withCredentials` and the 401→`/login` interceptor from `src/lib/api.ts`, and verify no `401`, `/login`, or `withCredentials` strings remain under `src/`
-- [ ] 1.5 Remove `better-auth` from `apps/frontend/package.json`, reinstall to update the lockfile, and verify `better-auth` appears in neither manifest nor lockfile
+- [ ] 1.1 Add dependency-free `src/lib/mock-auth.ts` (mock session `{ id, username }`, `localStorage` persistence, `signIn`/`signOut`/session hook) and verify it imports with no `better-auth` references
+- [ ] 1.2 Rewire `AuthProvider` to the mock store keeping the `{ user, isAuthenticated, loading, signOut }` shape, delete role types (`src/types/auth.ts` role, `src/lib/roles.ts`), and verify `tsc -b` passes with all 7 `useAuth`/`signOut` pages untouched
 
-## 2. Schema trim
+## 2. Login view and route guard
 
-- [ ] 2.1 Delete `User`, `Session`, `Account`, `Verification` models from `packages/db/prisma/schema.prisma` keeping `Event`, `MediumArticle`, `Achievement`, `AchievementMember` intact, and verify `prisma validate` succeeds with exactly 4 models
+- [ ] 2.1 Rewire `Login.tsx` submit to mock `signIn` + navigate (preserving the intended destination), keeping all markup and styles, and verify arbitrary non-empty credentials land on `/dashboard`
+- [ ] 2.2 Enforce the mock session in `ProtectedRoute` (remove the TEMP bypass) and verify deep links without a session redirect to `/login` while signed-in reloads stay put
 
-## 3. Docs scrub
+## 3. Framework removal
 
-- [ ] 3.1 Rewrite `docs/CHALLENGE.md` auth surface (drop Auth table, session-check note, auth model list, 401/403 + role rules; renumber definition-of-done) and verify no `Better Auth`/`/api/auth`/`401`/`403`/`role`/`session` strings remain
-- [ ] 3.2 Scrub `docs/PLAN_V1.md`, `docs/ROADMAP.md`, and `README.md` login/session/role sections, and verify no auth-framework or login/logout/session/role language remains outside archive history
+- [ ] 3.1 Delete `src/lib/auth-client.ts`, remove `better-auth` from `apps/frontend/package.json`, reinstall to update the lockfile, and verify `better-auth` appears in neither manifest nor lockfile
+- [ ] 3.2 Strip `withCredentials` and the 401→`/login` interceptor from `src/lib/api.ts`, and verify no `401`, `/login` redirect logic, or `withCredentials` strings remain under `src/`
 
-## 4. Final verification
+## 4. Schema trim
 
-- [ ] 4.1 Run repo-wide grep for `better-auth|betterAuth|Better Auth|useAuth|AuthContext|auth-client|signIn|get-session|signOut|/login|password` across `apps/`, `packages/`, `docs/`, `openspec/specs/`, `README.md` and verify zero matches (archive excluded)
-- [ ] 4.2 Run `tsc -b && vite build` in `apps/frontend`, `prisma validate` on the trimmed schema, and `openspec validate --change remove-auth-entirely` and verify all three succeed
+- [ ] 4.1 Delete `User`, `Session`, `Account`, `Verification` models from `packages/db/prisma/schema.prisma` keeping `Event`, `MediumArticle`, `Achievement`, `AchievementMember` intact, and verify `prisma validate` succeeds with exactly 4 models
+
+## 5. Docs scrub
+
+- [ ] 5.1 Rewrite `docs/CHALLENGE.md` auth surface (auth table becomes mock-login description, drop session-check note, 401/403 + role rules; renumber definition-of-done) and verify no `Better Auth`/`/api/auth`/`401`/`403` strings remain
+- [ ] 5.2 Scrub `docs/PLAN_V1.md` (mock rows), `docs/ROADMAP.md`, and `README.md` (roles/session sections), and verify no auth-framework or role language remains outside archive history
+
+## 6. Final verification
+
+- [ ] 6.1 Run repo-wide grep for `better-auth|betterAuth|Better Auth|auth-client|get-session|sign-in/username|withCredentials` across `apps/`, `packages/`, `docs/`, `openspec/specs/`, `README.md` and verify zero matches (archive excluded)
+- [ ] 6.2 Run `tsc -b && vite build` in `apps/frontend`, `prisma validate` on the trimmed schema, and `openspec validate --change remove-auth-entirely` and verify all three succeed

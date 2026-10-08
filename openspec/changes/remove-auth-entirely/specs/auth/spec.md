@@ -1,19 +1,47 @@
 # Spec Delta
 
-## REMOVED Requirements
+## MODIFIED Requirements
 
 ### Requirement: User login
-**Reason**: Authentication removed entirely — CMS is open with no login step.
-**Migration**: Delete `src/pages/Login.tsx`, `/login` route, `src/lib/auth-client.ts` sign-in calls, and any Better Auth endpoint references.
+The system SHALL provide a mock Login view that signs the user in locally with any submitted username and password, without calling any backend or validating credentials.
+
+#### Scenario: Successful login
+- **WHEN** user submits any non-empty username and password on the Login view
+- **THEN** system creates a frontend-local mock session and navigates to the dashboard
+
+#### Scenario: Failed login
+- **WHEN** user submits the login form with an empty username or password
+- **THEN** system remains on the Login view and prompts for the missing field (no credential validation exists; any non-empty credentials succeed)
+
+#### Scenario: Role-based redirect
+- **WHEN** user signs in through the mock Login view
+- **THEN** system navigates to the dashboard with all actions visible (roles do not exist; there is no read-only variant)
 
 ### Requirement: User logout
-**Reason**: No sessions exist, so there is nothing to invalidate.
-**Migration**: Remove all `signOut` usages and session-cookie handling from the frontend.
+The system SHALL allow a user to log out, clearing the frontend-local mock session.
+
+#### Scenario: Successful logout
+- **WHEN** user clicks logout
+- **THEN** mock session is cleared and user is returned to the Login view
 
 ### Requirement: Session persistence
-**Reason**: No session concept remains.
-**Migration**: Remove `AuthContext`/`useSession`/`get-session` polling; pages render directly.
+The system SHALL maintain the frontend-local mock session across page reloads.
+
+#### Scenario: Session persists across reloads
+- **WHEN** user reloads the page while a mock session exists
+- **THEN** user remains signed in and sees the current page
+
+#### Scenario: Expired session
+- **WHEN** a stored mock session exists
+- **THEN** no expiry applies and the session remains valid until logout (mock sessions do not expire)
 
 ### Requirement: Route protection
-**Reason**: All dashboard and API routes are open; no unauthorized state exists.
-**Migration**: Remove `ProtectedRoute` guard logic (render children unconditionally) and any 401 redirect handling.
+The system SHALL guard dashboard routes with the frontend-local mock session instead of a backend check.
+
+#### Scenario: Unauthenticated access attempt
+- **WHEN** user without a mock session attempts to access a protected route
+- **THEN** system redirects to the Login view
+
+#### Scenario: Authenticated access
+- **WHEN** user with a mock session accesses a protected route
+- **THEN** system allows access to the requested page

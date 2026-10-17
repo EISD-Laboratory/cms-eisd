@@ -86,7 +86,40 @@ This keeps both brand colors visible without either competing for attention agai
 - Short transitions only: 150–200ms, ease-out, on hover/focus/state changes.
 - No page-load choreography or scroll-triggered reveals — the dashboard is a tool, not a landing page.
 
-## 10. Components
+## 10. Interaction States — Cursor
+
+### Rule: clickable = pointer cursor
+Every element that triggers navigation or an action **must** show the click affordance (pointer cursor, `cursor: pointer`) on hover — users should never lose confidence that something is clickable.
+
+Covers, at minimum:
+- **Buttons** — every `Button` variant (default, outline, secondary, ghost, destructive, link)
+- **Links** — `<Link>`/`<a>`, including sidebar nav items and pagination
+- **Labels that toggle controls** (checkbox/radio rows, e.g. the login "remember me" label)
+- **Menu items, tabs, list rows/cards that are clickable, select options**
+
+### Implementation
+Tailwind v4's preflight intentionally resets `<button>` to the default cursor, so the pointer must be re-applied globally (one rule in `src/index.css`, before touching any component):
+
+```css
+button:not(:disabled),
+[role="button"]:not(:disabled),
+a,
+label:has(> button, > input),
+summary,
+select,
+option {
+  cursor: pointer;
+}
+```
+
+- The `:not(:disabled)` guards keep disabled controls honest — they render with the default cursor (`not-allowed` may be used per component if clearer).
+- Do **not** sprinkle per-element `cursor-pointer` classes; rely on the global rule and exception classes when needed (`cursor-default` on decorative elements, `cursor-text` on copyable text).
+- Opening the native picker is not enough for `select` and file-input rows — the pointer on the whole control communicates clickability.
+
+### Non-clickable is non-pointer
+The inverse also applies: purely presentational elements (static badges, status chips, table header cells, form labels for disabled/decorative inputs) keep the default cursor. Adding `cursor-pointer` to something that does nothing on click is a false affordance.
+
+## 11. Components
 Core dashboard components — ReUI defaults apply unless noted:
 - **Buttons:** primary / secondary / ghost / destructive — primary variant uses `--color-primary`
 - **Inputs / Select / Textarea:** ReUI form primitives

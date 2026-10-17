@@ -1,22 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import {
-  ArrowLeft,
-  Calendar,
-  Check,
-  FlaskConical,
-  LayoutDashboard,
-  LogOut,
-  Newspaper,
-} from 'lucide-react'
+import { ArrowLeft, Check } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/reui/alert'
 import { GalleryUpload, type GalleryImage } from '@/components/GalleryUpload'
 import { ImageUpload, type UploadedImage } from '@/components/ImageUpload'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useAuth } from '@/context/useAuth'
+import { useBack } from '@/lib/useBack'
 import { MOCK_EVENTS } from '@/mocks/events.fixtures'
 
 function slugify(title: string): string {
@@ -90,54 +82,12 @@ const errCls = 'mt-1 text-xs text-destructive'
 const textareaCls =
   'min-h-28 w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm'
 
-function Sidebar() {
-  const { signOut } = useAuth()
-  const item = (label: string, to: string, Icon: typeof Calendar, active = false) => (
-    <Link
-      key={label}
-      to={to}
-      className={`relative flex h-8 items-center gap-2 rounded-md px-2 pl-3 text-[13px] font-medium ${
-        active ? 'bg-secondary/10 font-semibold text-foreground' : 'text-muted-foreground hover:bg-[#F5F5F5]'
-      }`}
-    >
-      {active && (
-        <span className="absolute top-1/2 left-0 h-5 w-1 -translate-y-1/2 rounded-full bg-secondary" />
-      )}
-      <Icon className={`size-3.5 ${active ? 'text-secondary' : ''}`} />
-      {label}
-    </Link>
-  )
-  return (
-    <aside className="sticky top-0 flex h-screen w-52 shrink-0 flex-col overflow-y-auto border-r border-border bg-white p-3">
-      <div className="flex items-center gap-2 px-1">
-        <span className="grid size-7 place-items-center rounded-md bg-secondary text-secondary-foreground">
-          <FlaskConical className="size-3.5" />
-        </span>
-        <p className="text-sm font-semibold">EISD CMS</p>
-      </div>
-      <div className="mt-6">
-        <p className="px-2 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">Menu</p>
-        <nav className="mt-1 flex flex-col gap-0.5">
-          {item('Dashboard', '/dashboard', LayoutDashboard)}
-          {item('Events', '/events', Calendar, true)}
-          {item('Articles', '/articles', Newspaper)}
-        </nav>
-      </div>
-      <button
-        type="button"
-        onClick={() => void signOut()}
-        className="mt-auto flex h-8 items-center gap-2 rounded-md border-t border-border px-2 pt-2 text-[13px] font-medium text-muted-foreground hover:text-foreground"
-      >
-        <LogOut className="size-3.5" />
-        Log out
-      </button>
-    </aside>
-  )
-}
-
 export function EventForm({ mode }: { mode: 'create' | 'edit' }) {
   const { id } = useParams()
   const navigate = useNavigate()
+  // The sticky back arrow returns to wherever the user came from (e.g. the
+  // dashboard) instead of always the events list.
+  const back = useBack('/events')
   const existing = useMemo(
     () => (mode === 'edit' ? (MOCK_EVENTS.find((m) => m.id === id) ?? null) : null),
     [mode, id],
@@ -214,20 +164,17 @@ export function EventForm({ mode }: { mode: 'create' | 'edit' }) {
 
   if (mode === 'edit' && !existing) {
     return (
-      <div className="flex min-h-screen bg-white text-foreground">
-        <Sidebar />
-        <main className="flex min-w-0 flex-1 flex-col gap-6 p-6">
-          <Alert>
-            <AlertTitle>Event not found</AlertTitle>
-            <AlertDescription>
-              <span className="mb-3 block">No event with this id exists.</span>
-              <Link to="/events" className="text-sm font-medium underline underline-offset-4">
-                Back to events
-              </Link>
-            </AlertDescription>
-          </Alert>
-        </main>
-      </div>
+      <main className="flex min-w-0 flex-1 flex-col gap-6 p-6">
+        <Alert>
+          <AlertTitle>Event not found</AlertTitle>
+          <AlertDescription>
+            <span className="mb-3 block">No event with this id exists.</span>
+            <Link to="/events" className="text-sm font-medium underline underline-offset-4">
+              Back to events
+            </Link>
+          </AlertDescription>
+        </Alert>
+      </main>
     )
   }
 
@@ -293,8 +240,7 @@ export function EventForm({ mode }: { mode: 'create' | 'edit' }) {
   )
 
   return (
-    <div className="flex min-h-screen bg-white text-foreground">
-      <Sidebar />
+    <>
       <main className="mx-auto flex w-full max-w-3xl min-w-0 flex-1 flex-col gap-6 p-6">
         {/* Sticky header: back-to-events + title + step state stay visible on scroll. */}
         <div
@@ -303,7 +249,7 @@ export function EventForm({ mode }: { mode: 'create' | 'edit' }) {
           }`}
         >
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon-sm" onClick={() => void navigate('/events')} title="Back to events">
+            <Button variant="ghost" size="icon-sm" onClick={back} title="Back">
               <ArrowLeft className="size-4" />
             </Button>
             <div className="flex flex-col gap-1">
@@ -534,6 +480,6 @@ export function EventForm({ mode }: { mode: 'create' | 'edit' }) {
           </div>
         </div>
       )}
-    </div>
+    </>
   )
 }

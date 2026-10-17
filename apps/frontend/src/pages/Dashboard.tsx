@@ -1,16 +1,7 @@
 // Latest updates as a column table with zebra striping in the wrapper tint.
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import {
-  Calendar,
-  ChevronRight,
-  FlaskConical,
-  LayoutDashboard,
-  LogOut,
-  Newspaper,
-  Plus,
-  Trophy,
-} from 'lucide-react'
+import { Calendar, ChevronRight, Newspaper, Plus, Trophy } from 'lucide-react'
 import { Badge } from '@/components/reui/badge'
 import { IconTile } from '@/components/reui/icon-tile'
 import { StatNumber } from '@/components/StatNumber'
@@ -25,7 +16,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination'
-import { useAuth } from '@/context/useAuth'
 import {
   eventStatus,
   type DashboardArticle,
@@ -118,13 +108,6 @@ const MOCK_DASHBOARD: DashboardResponse = {
   ],
 }
 
-const NAV = [
-  { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard, active: true },
-  { label: 'Events', to: '/events', icon: Calendar, active: false },
-  { label: 'Articles', to: '/articles', icon: Newspaper, active: false },
-  { label: 'Achievements', to: '/achievements', icon: Trophy, active: false },
-]
-
 const PAGE_SIZE = 5
 
 type Kind = 'event' | 'article'
@@ -143,49 +126,6 @@ function formatLong(iso: string) {
 
 // TODO: wire to the detail route when it exists.
 function handleSeeDetail() {}
-
-function Sidebar() {
-  const { signOut } = useAuth()
-
-  return (
-    <aside className="sticky top-0 flex h-screen w-52 shrink-0 flex-col overflow-y-auto border-r border-border bg-white p-3">
-      <div className="flex items-center gap-2 px-1">
-        <span className="grid size-7 place-items-center rounded-md bg-secondary text-secondary-foreground">
-          <FlaskConical className="size-3.5" />
-        </span>
-        <p className="text-sm font-semibold">EISD CMS</p>
-      </div>
-      <div className="mt-6">
-        <p className="px-2 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">Menu</p>
-        <nav className="mt-1 flex flex-col gap-0.5">
-          {NAV.map((item) => (
-            <Link
-              key={item.label}
-              to={item.to}
-              className={`relative flex h-8 items-center gap-2 rounded-md px-2 pl-3 text-[13px] font-medium ${
-                item.active ? 'bg-secondary/10 font-semibold text-foreground' : 'text-muted-foreground hover:bg-[#F5F5F5]'
-              }`}
-            >
-              {item.active && (
-                <span className="absolute top-1/2 left-0 h-5 w-1 -translate-y-1/2 rounded-full bg-secondary" />
-              )}
-              <item.icon className={`size-3.5 ${item.active ? 'text-secondary' : ''}`} />
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-      </div>
-      <button
-        type="button"
-        onClick={() => void signOut()}
-        className="mt-auto flex h-8 items-center gap-2 rounded-md border-t border-border px-2 pt-2 text-[13px] font-medium text-muted-foreground hover:text-foreground"
-      >
-        <LogOut className="size-3.5" />
-        Log out
-      </button>
-    </aside>
-  )
-}
 
 function StatusBadge({ published }: { published: boolean }) {
   return published ? (
@@ -473,9 +413,7 @@ export function Dashboard() {
   ]
 
   return (
-    <div className="flex min-h-screen bg-white text-foreground">
-      <Sidebar />
-
+    <>
       {/* Main column — p-6 = 24px */}
       <main className="flex min-w-0 flex-1 flex-col gap-6 p-6">
         <div className="flex items-center justify-between gap-4">
@@ -484,12 +422,16 @@ export function Dashboard() {
             <p className="text-sm text-muted-foreground">Content overview for EISD Laboratory</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline">
-              <Plus className="size-4" /> New article
-            </Button>
-            <Button className="text-white">
-              <Plus className="size-4" /> New event
-            </Button>
+            <Link to="/articles/new">
+              <Button variant="outline">
+                <Plus className="size-4" /> New article
+              </Button>
+            </Link>
+            <Link to="/events/new">
+              <Button className="text-white">
+                <Plus className="size-4" /> New event
+              </Button>
+            </Link>
           </div>
         </div>
 
@@ -608,6 +550,6 @@ export function Dashboard() {
           </>
         )}
       </main>
-    </div>
+    </>
   )
 }

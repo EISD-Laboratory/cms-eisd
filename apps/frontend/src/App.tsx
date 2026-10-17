@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { AuthProvider } from './context/AuthContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
+import { AppLayout } from './components/AppLayout'
 import { Login } from './pages/Login'
 import { Dashboard } from './pages/Dashboard'
 import { Events } from './pages/Events'
@@ -21,78 +22,25 @@ function App() {
         <Routes>
           <Route path="/" element={<div>Home</div>} />
           <Route path="/login" element={<Login />} />
+          {/* All protected pages share one layout: the sidebar renders once
+              and stays put as nested routes swap in via <Outlet />. */}
           <Route
-            path="/dashboard"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <AppLayout />
               </ProtectedRoute>
             }
-          />
-          <Route
-            path="/events"
-            element={
-              <ProtectedRoute>
-                <Events />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/events/new"
-            element={
-              <ProtectedRoute>
-                <EventForm mode="create" />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/events/:id/edit"
-            element={
-              <ProtectedRoute>
-                <EventForm mode="edit" />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/articles"
-            element={
-              <ProtectedRoute>
-                <Articles />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/articles/new"
-            element={
-              <ProtectedRoute>
-                <ArticleForm />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/achievements"
-            element={
-              <ProtectedRoute>
-                <Achievements />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/achievements/new"
-            element={
-              <ProtectedRoute>
-                <AchievementForm mode="create" />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/achievements/:id/edit"
-            element={
-              <ProtectedRoute>
-                <AchievementForm mode="edit" />
-              </ProtectedRoute>
-            }
-          />
+          >
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/events/new" element={<EventForm mode="create" />} />
+            <Route path="/events/:id/edit" element={<EventForm mode="edit" />} />
+            <Route path="/articles" element={<Articles />} />
+            <Route path="/articles/new" element={<ArticleForm />} />
+            <Route path="/achievements" element={<Achievements />} />
+            <Route path="/achievements/new" element={<AchievementForm mode="create" />} />
+            <Route path="/achievements/:id/edit" element={<AchievementForm mode="edit" />} />
+          </Route>
           {/* PROTOTYPE route — throwaway, do not ship. */}
           <Route path="/prototype/sidebar-bg" element={<SidebarBgPrototype />} />
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,6 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Stack+Sans+Text:wght@200..700&display=swap');
 @import "tailwindcss";
 
+/* Cursor affordance — docs/design_system.md §10 "Interaction States — Cursor".
+   Tailwind v4 preflight resets <button> to the default cursor; clicking
+   affordance is re-applied globally here instead of sprinkling
+   cursor-pointer per component. Disabled controls keep the default cursor
+   so "clickable" never lies. */
+button:not(:disabled),
+[role="button"]:not(:disabled),
+a,
+label:has(> button, > input),
+summary,
+select,
+option {
+  cursor: pointer;
+}
+
 /* Paginated table rows: staggered enter so page changes cascade instead of popping. */
 @keyframes row-enter {
   from {

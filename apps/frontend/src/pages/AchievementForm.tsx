@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/context/useAuth'
+import { useBack } from '@/lib/useBack'
 import {
   type AchievementCategory,
   type AchievementLevel,
@@ -145,6 +146,9 @@ function Sidebar() {
 export function AchievementForm({ mode }: { mode: 'create' | 'edit' }) {
   const { id } = useParams()
   const navigate = useNavigate()
+  // Leaving the form returns to wherever the user came from (e.g. the
+  // dashboard) instead of always the achievements list.
+  const back = useBack('/achievements')
   const existing = useMemo(
     () => (mode === 'edit' ? (MOCK_ACHIEVEMENTS.find((m) => m.id === id) ?? null) : null),
     [mode, id],
@@ -272,7 +276,7 @@ export function AchievementForm({ mode }: { mode: 'create' | 'edit' }) {
       <Sidebar />
       <main className="mx-auto flex w-full max-w-3xl min-w-0 flex-1 flex-col gap-6 p-6">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon-sm" onClick={() => void navigate('/achievements')} title="Back to achievements">
+          <Button variant="ghost" size="icon-sm" onClick={back} title="Back">
             <ArrowLeft className="size-4" />
           </Button>
           <div className="flex flex-col gap-1">
@@ -459,11 +463,9 @@ export function AchievementForm({ mode }: { mode: 'create' | 'edit' }) {
             )}
 
             <div className="flex items-center justify-end gap-2 border-t border-border pt-4">
-              <Link to="/achievements">
-                <Button variant="outline" type="button">
-                  Cancel
-                </Button>
-              </Link>
+              <Button variant="outline" type="button" onClick={back}>
+                Cancel
+              </Button>
               <Button type="submit" className="text-white">
                 {mode === 'create' ? 'Save achievement' : 'Save changes'}
               </Button>

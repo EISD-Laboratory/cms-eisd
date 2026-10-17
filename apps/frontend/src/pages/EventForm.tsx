@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/context/useAuth'
+import { useBack } from '@/lib/useBack'
 import { MOCK_EVENTS } from '@/mocks/events.fixtures'
 
 function slugify(title: string): string {
@@ -138,6 +139,9 @@ function Sidebar() {
 export function EventForm({ mode }: { mode: 'create' | 'edit' }) {
   const { id } = useParams()
   const navigate = useNavigate()
+  // The sticky back arrow returns to wherever the user came from (e.g. the
+  // dashboard) instead of always the events list.
+  const back = useBack('/events')
   const existing = useMemo(
     () => (mode === 'edit' ? (MOCK_EVENTS.find((m) => m.id === id) ?? null) : null),
     [mode, id],
@@ -303,7 +307,7 @@ export function EventForm({ mode }: { mode: 'create' | 'edit' }) {
           }`}
         >
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon-sm" onClick={() => void navigate('/events')} title="Back to events">
+            <Button variant="ghost" size="icon-sm" onClick={back} title="Back">
               <ArrowLeft className="size-4" />
             </Button>
             <div className="flex flex-col gap-1">

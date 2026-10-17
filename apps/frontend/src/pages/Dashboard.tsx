@@ -484,12 +484,16 @@ export function Dashboard() {
             <p className="text-sm text-muted-foreground">Content overview for EISD Laboratory</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline">
-              <Plus className="size-4" /> New article
-            </Button>
-            <Button className="text-white">
-              <Plus className="size-4" /> New event
-            </Button>
+            <Link to="/articles/new">
+              <Button variant="outline">
+                <Plus className="size-4" /> New article
+              </Button>
+            </Link>
+            <Link to="/events/new">
+              <Button className="text-white">
+                <Plus className="size-4" /> New event
+              </Button>
+            </Link>
           </div>
         </div>
 

@@ -55,16 +55,16 @@ Key architectural decisions carried over from the draft:
 
 ## 6. Core Features
 
-### 6.1 Authentication
+### 6.1 Mock login (frontend-local, no backend)
 
 | Capability | Notes |
 |---|---|
-| Login | Single admin account (or small fixed set) for V1. No self-registration. |
-| Logout | Invalidates the current session. |
-| Session persistence | Admin stays logged in across page reloads within a reasonable session lifetime. |
-| Route protection | Every dashboard/API route except login is inaccessible without a valid session. |
+| Login | Mock Login view: any non-empty username + password signs in locally. No backend call, no credential validation, no registration. |
+| Logout | Clears the frontend-local mock session and returns to `/login`. |
+| Session persistence | Mock session persists across page reloads via `localStorage`; it never expires. |
+| Route protection | Every dashboard route except login requires the local mock session; without it the visitor is redirected to `/login`. |
 
-Edge cases to handle: expired session redirects to login with the intended destination preserved; failed login shows a generic error (no hinting at whether the username exists).
+Edge cases to handle: submitting with an empty username or password stays on the Login view and prompts for the missing field. There is no invalid-credentials error — any non-empty credentials succeed — and no password is ever persisted.
 
 ### 6.2 Dashboard
 

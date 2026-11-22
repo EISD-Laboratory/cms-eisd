@@ -7,7 +7,7 @@ This is a rough, directional plan. Scope and order may shift as V1 ships and rea
 ## V1 — Foundation
 *Goal: a simple, stable base the org can actually run on.*
 
-- Authentication (login, logout, session)
+- Mock login (frontend-local sign-in, no backend, no roles)
 - Dashboard (totals, upcoming events, latest events, achievements KPI)
 - Event management (create/edit/delete, Draft → Publish, computed status)
 - Medium Article management (URL-only input, auto-fetched Open Graph metadata, Draft → Publish)

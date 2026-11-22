@@ -23,9 +23,8 @@ import {
   type DashboardResponse,
 } from '@/lib/dashboard'
 
-// TEMP (disable-auth-for-fe-testing) — REVERT ME: dashboard BE unwired for
-// UI testing. Static mock replaces fetchDashboard() (GET /api/dashboard,
-// auth-guarded → 401 with no session → "Could not load dashboard data").
+// Dashboard renders fixture content (MOCK_DASHBOARD below) until the real
+// open GET /api/dashboard endpoint exists. No auth is required.
 // Task 2.2 rewire: delete MOCK_DASHBOARD below and restore the
 // fetchDashboard() calls in `load` + `useEffect`.
 const MOCK_DASHBOARD: DashboardResponse = {
@@ -278,8 +277,8 @@ export function Dashboard() {
     setLoading(true)
     setError(false)
     try {
-      // TEMP (disable-auth-for-fe-testing) — REVERT ME: use MOCK_DASHBOARD,
-      // restore `await fetchDashboard()` in task 2.2.
+      // Fixture mode: MOCK_DASHBOARD stands in for the open
+      // GET /api/dashboard endpoint until the real API exists.
       setDashboard(MOCK_DASHBOARD)
       setPage(0)
     } catch {
@@ -290,9 +289,8 @@ export function Dashboard() {
   }
 
   useEffect(() => {
-    // TEMP (disable-auth-for-fe-testing) — REVERT ME: mock instead of
-    // fetchDashboard() so /dashboard renders with no session/backend.
-    // Task 2.2 rewire restores the live fetch.
+    // Fixture mode: render MOCK_DASHBOARD with no backend. Restore the live
+    // fetchDashboard() call once the real open endpoint exists.
     setDashboard(MOCK_DASHBOARD)
     setLoading(false)
   }, [])

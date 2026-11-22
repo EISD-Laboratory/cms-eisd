@@ -69,9 +69,9 @@ function ResultBadge({ result }: { result: string }) {
 }
 
 export function Achievements() {
-  // TEMP (disable-auth-for-fe-testing): mock mode like Events/Articles —
-  // all actions visible without a session. Real role-gating + backend
-  // enforcement land with the API wiring (tasks 3.1/3.3).
+  // Mock mode like Events/Articles — all actions are always visible to every
+  // visitor: list/create/update/delete are open and the open API serves them
+  // without auth.
   const [achievements, setAchievements] = useState<Achievement[]>([])
   const [loading, setLoading] = useState(true)
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('All')

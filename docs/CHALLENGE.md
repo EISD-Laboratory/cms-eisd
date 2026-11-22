@@ -37,24 +37,22 @@ fixtures unless it is explicitly `'false'`:
 | `VITE_USE_MOCKS` | unset → mocks | Set `VITE_USE_MOCKS=false` to exercise your real API (pages still fall back to fixtures on network failure, so flip it only when your server is up) |
 | `VITE_API_URL` | `http://localhost:3000` | Where the frontend expects your API |
 
-One console error is **expected noise, not your bug**: each page fires
-`GET :3000/api/auth/get-session` (Better Auth session check) which fails with
-`ERR_CONNECTION_REFUSED` while no API exists. Pages render anyway. It goes away
-once your auth endpoint answers.
-
-> Auth is currently bypassed in `ProtectedRoute` (marked `TEMP — REVERT ME`)
-> so every page renders without a session. When your login works, delete that
-> bypass block to re-enable route protection.
+**Mock login is the default.** There is no backend session to check: opening
+`/login` and submitting any non-empty username + password creates a
+frontend-local mock session (persisted in `localStorage`, cleared on logout)
+and navigates to `/dashboard`. Route guards read only that local flag and
+never call a backend.
 
 ## 2. The data model (fixed input — do not redesign)
 
-The full Prisma schema lives at **`packages/db/prisma/schema.prisma`** (moved out
-of the deleted backend tree). It is the exact model the frontend and specs
-assume. All eight models must be served as-is:
+The content-only Prisma schema lives at **`packages/db/prisma/schema.prisma`**
+(moved out of the deleted backend tree). It is the exact model the frontend
+and specs assume. All four models must be served as-is:
 
-`User`, `Session`, `Account`, `Verification` (Better Auth tables — they exist to
-serve the session contract, intimidating on purpose), `Event`, `MediumArticle`,
-`Achievement`, `AchievementMember`.
+`Event`, `MediumArticle`, `Achievement`, `AchievementMember`.
+
+There are no user, session, or account tables — the mock login lives in
+`localStorage` and needs no database.
 
 Run `prisma migrate dev` against it yourself to create your own migration
 history — none is shipped. If the owner shared the `v1-backend-reference` git
@@ -64,22 +62,17 @@ it is otherwise your design decision).
 
 ## 3. The contract (what your backend must satisfy)
 
-Base URL defaults to `http://localhost:3000`. Cookie-based sessions
-(`withCredentials`), JSON bodies. Unauthenticated callers get **401**
-(frontend redirects to `/login`); `user`-role callers hitting write endpoints
-get **403**; missing/unpublished reads get **404**.
+Base URL defaults to `http://localhost:3000`. JSON bodies. All endpoints are
+open — no sessions, no credentials, no role checks. Missing/unpublished reads
+get **404**; bad input gets **400** with field errors (duplicate assistant
+code → **409**).
 
-### Auth (`/api/auth`, Better Auth mount point)
+### Login (mock, frontend-local — nothing to rebuild)
 
-| Call | Body | Behavior |
-|------|------|----------|
-| `POST /api/auth/sign-in/username` | `{ username, password, rememberMe }` | Creates session, lands on `/dashboard`. Errors stay generic ("Invalid username or password") — never reveal whether a username exists |
-| `GET /api/auth/get-session` | — | Returns session incl. `role` on every mount; survives reloads within session lifetime |
-| `POST /api/auth/sign-out` | — | Invalidates session, redirects to `/login` |
-
-Roles: `admin` = full CRUD + publish + user management; `user` = read-only
-dashboard (edit/delete hidden in UI, writes rejected 403). Role lives in the
-session and is checked on every request.
+The Login view at `/login` is a frontend mockup: any non-empty username +
+password signs in locally and lands on `/dashboard`; logout clears the local
+flag and returns to `/login`. There is no auth endpoint to implement, no
+session to check, and no roles of any kind.
 
 ### Events
 
@@ -111,7 +104,7 @@ save time — the public site reads the snapshot, nothing ever re-scrapes Medium
 
 ### Dashboard
 
-`GET /api/dashboard` (authenticated) returns one aggregation:
+`GET /api/dashboard` (open, no authentication) returns one aggregation:
 counts (`totalEvents`, `publishedEvents`, `draftEvents`, `totalArticles`,
 `publishedArticles`, `draftArticles`, `upcomingEvents`, `totalAchievements`,
 `finalistAchievements`, `championAchievements`), `achievementsByYear`

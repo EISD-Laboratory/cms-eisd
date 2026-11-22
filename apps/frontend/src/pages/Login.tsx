@@ -1,19 +1,19 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, TriangleAlert } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription, AlertTitle } from '@/components/reui/alert'
 import { Frame, FrameHeader, FramePanel } from '@/components/reui/frame'
-import { authClient } from '@/lib/auth-client'
+import { signIn } from '@/lib/mock-auth'
 
-// Username/password login. Submits to Better Auth
-// (POST /api/auth/sign-in/username) and returns to the originally requested
-// page (or /dashboard) on success. Error copy stays generic per the auth spec
-// (never reveal whether a username exists).
+// Mock login. No backend, no credential validation: any non-empty
+// username + password creates a frontend-local session and navigates to
+// the originally requested page (or /dashboard). No password is persisted.
 export function Login() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -24,19 +24,17 @@ export function Login() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (submitting) return
-    setSubmitting(true)
-    setError('')
-    const { error: signInError } = await authClient.signIn.username({
-      username: username.trim(),
-      password,
-      rememberMe: remember,
-    })
-    setSubmitting(false)
-    if (signInError) {
-      setError('Invalid username or password.')
+    if (username.trim() === '' || password === '') {
+      setError('Enter both username and password.')
       return
     }
-    navigate('/dashboard', { replace: true })
+    setSubmitting(true)
+    setError('')
+    signIn(username.trim())
+    void remember
+    setSubmitting(false)
+    const from = (location.state as { from?: string } | null)?.from ?? '/dashboard'
+    navigate(from, { replace: true })
   }
 
   return (

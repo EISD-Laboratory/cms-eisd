@@ -1,17 +1,13 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context/useAuth'
 
-// Task 9.3: blocks unauthenticated access. While the session is being
-// revalidated a neutral loading state renders (no protected content flashes).
-// Redirects preserve the intended destination so login can send the admin back.
+// Blocks unauthenticated access against the frontend-local mock session.
+// While the session is being read from localStorage a neutral loading state
+// renders (no protected content flashes). Redirects preserve the intended
+// destination so login can send the visitor back.
 export function ProtectedRoute({ children }: { children: React.JSX.Element }) {
   const { isAuthenticated, loading } = useAuth()
   const location = useLocation()
-
-  // TEMP (disable-auth-for-fe-testing) — REVERT ME: bypass auth for UI testing.
-  // Returns children unconditionally so every guarded route renders without
-  // a session. Delete this block to re-enable route protection.
-  return children
 
   if (loading) {
     return (

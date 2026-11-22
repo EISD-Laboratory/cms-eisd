@@ -34,7 +34,7 @@ The public website is a read-only consumer of published content — it has no wr
 
 ## Project Status
 
-Currently past planning and into **V1 implementation**. V1 scope covers Authentication, Dashboard, Event Management, Medium Article Management, and Achievement Management. Achievements are specified in [`openspec/specs/achievements/`](./openspec/specs/achievements/) with database schema plus seeds and a mock-mode frontend; the backend API is still pending. See:
+Currently past planning and into **V1 implementation**. V1 scope covers Mock Login, Dashboard, Event Management, Medium Article Management, and Achievement Management. Achievements are specified in [`openspec/specs/achievements/`](./openspec/specs/achievements/) with database schema plus seeds and a mock-mode frontend; the backend API is still pending. See:
 
 - [`PLAN_V1.md`](./docs/PLAN_V1.md) — the detailed V1 product requirements and information architecture.
 - [`ROADMAP.md`](./docs/ROADMAP.md) — the rough plan from V1 through V4.
@@ -45,25 +45,10 @@ The core principle across every version of this project: **keep V1 simple and fa
 
 Technology stack decisions are intentionally excluded from this documentation for now and will be addressed separately.
 
-## User Roles
+## Access
 
-The CMS supports two user roles:
-
-### Admin Role
-- Full CRUD access to all content (events, articles, achievements)
-- Can create, edit, and delete content
-- Can publish and unpublish content
-- Can manage user roles
-
-### User Role
-- Read-only access to the dashboard
-- Can view all content but cannot modify it
-- Edit/delete buttons are hidden in the UI
-- Write API endpoints return 403 Forbidden
-
-### Role-Based API Access
-- **Read endpoints** (GET): Accessible by all authenticated users
-- **Write endpoints** (POST, PUT, DELETE): Restricted to admin role only
-
-### Session Management
-After login, the user's role is stored in the session and checked on every request. The frontend uses the role to conditionally render UI elements.
+Sign-in is a frontend-local mock: submitting any non-empty username and
+password on the Login view creates a mock session (persisted in
+`localStorage`) and navigates to the dashboard. Logout clears it and returns
+to `/login`. There are no roles and no backend session — every visitor who
+signs in sees all actions, and route guards check only the local mock flag.
